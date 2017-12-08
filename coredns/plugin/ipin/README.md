@@ -1,13 +1,24 @@
++++
+title = "ipin"
+description = "*ipin* returns IP address and port based on you domain name."
+weight = 10
+tags = [  "plugin" , "ipin" ]
+categories = [ "plugin", "external" ]
+date = "2017-12-09T02:00:00+08:00"
+repo = "https://github.com/wenerme/wps"
+home = "https://github.com/wenerme/wps/blob/master/coredns/plugin/ipin/README.md"
++++
+
 # ipin
 
-*ipin* returns your resolver's local IP address and port based on you domain name. Your IP address is returned
+*ipin* returns IP address and port based on you domain name. Your IP address is returned
  in the additional section as either an A or AAAA record.
 
 The reply always has an empty answer section. The port are included in the additional
 section as a SRV record.
 
 ~~~ txt
-._<transport>.qname. 0 IN SRV 0 0 <port> .
+._port.qname. 0 IN SRV 0 0 <port> .
 ~~~
 
 
