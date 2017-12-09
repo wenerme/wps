@@ -37,7 +37,7 @@ func (self IpInName) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 		rr.(*dns.A).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeA, Class: state.QClass()}
 		rr.(*dns.A).A = net.ParseIP(ip).To4()
 
-		a.Extra = []dns.RR{rr}
+		a.Answer = []dns.RR{rr}
 
 		if len(matches[2]) > 0 {
 			srv := new(dns.SRV)
@@ -49,7 +49,7 @@ func (self IpInName) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 			srv.Port = uint16(port)
 			srv.Target = "."
 
-			a.Extra = append(a.Extra, srv)
+			a.Extra = []dns.RR{srv}
 		}
 	} else {
 		// return empty
