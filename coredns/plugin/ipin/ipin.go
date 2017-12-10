@@ -6,6 +6,7 @@ import (
 	"github.com/coredns/coredns/request"
 	"net"
 
+	"github.com/coredns/coredns/plugin"
 	"github.com/miekg/dns"
 	"golang.org/x/net/context"
 	"regexp"
@@ -13,13 +14,18 @@ import (
 	"strings"
 )
 
+const Name = "ipin"
+
 type IpInName struct {
+	// When process failed, will call next plugin
+	Fallback bool
+	Next     plugin.Handler
 }
 
 var regIpDash = regexp.MustCompile(`^(\d{1,3}-\d{1,3}-\d{1,3}-\d{1,3})(-\d+)?\.`)
 
-func (self IpInName) Name() string { return "ipin" }
-func (self IpInName) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
+func (self IpInName) Name() string { return Name }
+func (self IpInName) Resolve(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (*dns.Msg, int, error) {
 	state := request.Request{W: w, Req: r}
 
 	a := new(dns.Msg)
@@ -55,6 +61,19 @@ func (self IpInName) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 		// return empty
 	}
 
-	w.WriteMsg(a)
+	return a, 0, nil
+}
+func (self IpInName) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
+	a, i, err := self.Resolve(ctx, w, r)
+	if err != nil {
+		return i, err
+	}
+
+	if self.Fallback && len(a.Answer) == 0 {
+		return self.Next.ServeDNS(ctx, w, r)
+	} else {
+		w.WriteMsg(a)
+	}
+
 	return 0, nil
 }

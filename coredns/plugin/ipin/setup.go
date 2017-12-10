@@ -7,22 +7,34 @@ import (
 )
 
 func init() {
-	caddy.RegisterPlugin("ipin", caddy.Plugin{
+	caddy.RegisterPlugin(Name, caddy.Plugin{
 		ServerType: "dns",
 		Action:     setup,
 	})
 }
 
 func setup(c *caddy.Controller) error {
+	ipin := IpInName{}
+
 	c.Next() // ipin
+	for c.NextBlock() {
+		x := c.Val()
+		switch x {
+		case "fallback":
+			ipin.Fallback = true
+		default:
+			return plugin.Error(Name, c.Errf("unexpected '%v' command", x))
+		}
+	}
 	if c.NextArg() {
-		return plugin.Error("ipin", c.ArgErr())
+		return plugin.Error(Name, c.ArgErr())
 	}
 
 	dnsserver.
 		GetConfig(c).
 		AddPlugin(func(next plugin.Handler) plugin.Handler {
-			return IpInName{}
+			ipin.Next = next
+			return ipin
 		})
 
 	return nil

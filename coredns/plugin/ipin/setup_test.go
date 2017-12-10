@@ -12,7 +12,21 @@ func TestSetupWhoami(t *testing.T) {
 		t.Fatalf("Expected no errors, but got: %v", err)
 	}
 
+	c = caddy.NewTestController("dns", `ipin {
+fallback
+}`)
+	if err := setup(c); err != nil {
+		t.Fatalf("Expected no errors, but got: %v", err)
+	}
+
 	c = caddy.NewTestController("dns", `ipin example.org`)
+	if err := setup(c); err == nil {
+		t.Fatalf("Expected errors, but got: %v", err)
+	}
+
+	c = caddy.NewTestController("dns", `ipin {
+fallback invalid
+}`)
 	if err := setup(c); err == nil {
 		t.Fatalf("Expected errors, but got: %v", err)
 	}

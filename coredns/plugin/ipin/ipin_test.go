@@ -25,7 +25,7 @@ func TestWhoami(t *testing.T) {
 			qname:         "192-168-1-2-80.example.org",
 			qtype:         dns.TypeA,
 			expectedCode:  dns.RcodeSuccess,
-			expectedReply: []string{"192-168-1-2.example.org.", "_port.192-168-1-2.example.org."},
+			expectedReply: []string{"192-168-1-2-80.example.org.", "_port.192-168-1-2-80.example.org."},
 			expectedErr:   nil,
 		},
 	}
@@ -46,11 +46,16 @@ func TestWhoami(t *testing.T) {
 			t.Errorf("Test %d: Expected status code %d, but got %d", i, tc.expectedCode, code)
 		}
 		if len(tc.expectedReply) != 0 {
-			for i, expected := range tc.expectedReply {
-				actual := rec.Msg.Extra[i].Header().Name
-				if actual != expected {
-					t.Errorf("Test %d: Expected answer %s, but got %s", i, expected, actual)
-				}
+			actual := rec.Msg.Answer[0].Header().Name
+			expected := tc.expectedReply[0]
+			if actual != expected {
+				t.Errorf("Test %d: Expected answer %s, but got %s", i, expected, actual)
+			}
+
+			actual = rec.Msg.Extra[0].Header().Name
+			expected = tc.expectedReply[1]
+			if actual != expected {
+				t.Errorf("Test %d: Expected answer %s, but got %s", i, expected, actual)
 			}
 		}
 	}

@@ -25,7 +25,10 @@ The optional port are included in the additional section as a SRV record.
 ## Syntax
 
 ~~~ txt
-ipin
+ipin {
+  // if pattern not match, keep processing
+  fallback
+}
 ~~~
 
 ## Examples
