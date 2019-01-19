@@ -72,8 +72,6 @@ func (self IpInName) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.
 	if self.Fallback && len(a.Answer) == 0 {
 		return self.Next.ServeDNS(ctx, w, r)
 	} else {
-		w.WriteMsg(a)
+		return 0, w.WriteMsg(a)
 	}
-
-	return 0, nil
 }
