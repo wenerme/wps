@@ -3,7 +3,7 @@ package ipin
 import (
 	"testing"
 
-	"github.com/caddyserver/caddy"
+	"github.com/coredns/caddy"
 )
 
 func TestSetupWhoami(t *testing.T) {
